@@ -79,14 +79,19 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
                     size = size + tmp.getWidth();
+                    tmp = null;
                     tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b2);
                     size = size + tmp.getWidth();
+                    tmp = null;
                     tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b3);
                     size = size + tmp.getWidth();
+                    tmp = null;
                     tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b4);
                     size = size + tmp.getWidth();
+                    tmp = null;
                     tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b5);
                     size = size + tmp.getWidth();
+                    tmp = null;
                 } catch (OutOfMemoryError e) {
                 }
                 long koniec = System.currentTimeMillis();
