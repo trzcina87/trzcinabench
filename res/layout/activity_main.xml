@@ -87,12 +87,35 @@
             android:text="Wyrazenia" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/lay4"
+        android:layout_below="@id/lay3"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/zapistab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Zapis Tablicy" />
+
+        <Button
+            android:id="@+id/odczyttab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Odczyt Tablicy" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/opis"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/lay3"
-        android:text="Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :" />
+        android:layout_below="@+id/lay4"
+        android:text="Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :\nZapis Tablica - zapisuje tablice 1000 x 1000 int do pliku\nOdczyt Tablica - odczytuje tablice 1000 x 1000 int z pliku" />
 
 
 </RelativeLayout>

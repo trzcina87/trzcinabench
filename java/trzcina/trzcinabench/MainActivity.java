@@ -1,5 +1,6 @@
 package trzcina.trzcinabench;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +18,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,6 +59,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 podzialPliku();
+            }
+        });
+        findViewById(R.id.zapistab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                zapisDanychReczny();
+            }
+        });
+        findViewById(R.id.odczyttab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                odczytDanychTab();
             }
         });
     }
@@ -103,11 +119,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void alokacjaPamieci() {
         wynik.setText("");
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        final int pamiec = am.getMemoryClass();
+        final int pamiecmax = am.getLargeMemoryClass();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                long bajtylong = Long.SIZE;
-                Log.e("BAJTY", String.valueOf(bajtylong));
+                long bajtylong = Long.BYTES;
                 long tablica[][] = new long[1000][];
                 boolean dzialam = true;
                 int i = 0;
@@ -122,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }
-                ustawWynik("Zaalokowano: " + i + " MB");
+                ustawWynik("Long: " + bajtylong + " bajty\nPamiec: " + pamiec + "\nPamiec Max: " + pamiecmax + "\nZaalokowano: " + i + " MB");
             }
         }).start();
     }
@@ -147,10 +165,45 @@ public class MainActivity extends AppCompatActivity {
                 }
                 long koniec = System.currentTimeMillis();
                 long czas = koniec - start;
+                long suma = dane.suma();
                 if(sukces) {
-                    ustawWynik("Powodzenie: " + czas);
+                    ustawWynik("Powodzenie: " + czas + " Suma: " + suma);
                 } else {
-                    ustawWynik("Blad: " + czas);
+                    ustawWynik("Blad: " + czas + " Suma: " + suma);
+                }
+            }
+        }).start();
+    }
+
+    private void zapisDanychReczny() {
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long start = System.currentTimeMillis();
+                Dane dane = new Dane();
+                dane.wypelnij();
+                boolean sukces = true;
+                try {
+                    ByteBuffer bajtytablicy = ByteBuffer.allocate(4 * Dane.rozmiar * Dane.rozmiar);
+                    IntBuffer intbajtytablicy = bajtytablicy.asIntBuffer();
+                    for(int i = 0; i < Dane.rozmiar; i++) {
+                        intbajtytablicy.put(dane.tablica[i]);
+                    }
+                    FileOutputStream plik = MainActivity.this.openFileOutput("danev2", Context.MODE_PRIVATE);
+                    plik.write(bajtytablicy.array(), 0, 4 * Dane.rozmiar * Dane.rozmiar);
+                    plik.close();
+                } catch (Exception e) {
+                    sukces = false;
+                    e.printStackTrace();
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                long suma = dane.suma();
+                if(sukces) {
+                    ustawWynik("Powodzenie: " + czas + " Suma: " + suma);
+                } else {
+                    ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
             }
         }).start();
@@ -163,10 +216,11 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 long start = System.currentTimeMillis();
                 boolean sukces = true;
+                Dane dane = null;
                 try {
                     FileInputStream cachefileinput = MainActivity.this.openFileInput("dane");
                     ObjectInputStream cahceobjectinput = new ObjectInputStream(cachefileinput);
-                    Dane dane = (Dane)cahceobjectinput.readObject();
+                    dane = (Dane)cahceobjectinput.readObject();
                     cahceobjectinput.close();
                     cachefileinput.close();
                 } catch (Exception e) {
@@ -174,10 +228,44 @@ public class MainActivity extends AppCompatActivity {
                 }
                 long koniec = System.currentTimeMillis();
                 long czas = koniec - start;
+                long suma = dane.suma();
                 if(sukces) {
-                    ustawWynik("Powodzenie: " + czas);
+                    ustawWynik("Powodzenie: " + czas + " Suma: " + suma);
                 } else {
-                    ustawWynik("Blad: " + czas);
+                    ustawWynik("Blad: " + czas + " Suma: " + suma);
+                }
+            }
+        }).start();
+    }
+
+    private void odczytDanychTab() {
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long start = System.currentTimeMillis();
+                boolean sukces = true;
+                Dane dane = new Dane();
+                dane.inicjuj();
+                try {
+                    ByteBuffer bajtytablicy = ByteBuffer.allocate(4 * Dane.rozmiar * Dane.rozmiar);
+                    FileInputStream plik = MainActivity.this.openFileInput("danev2");
+                    plik.read(bajtytablicy.array(), 0, 4 * Dane.rozmiar * Dane.rozmiar);
+                    plik.close();
+                    IntBuffer intbajtytablicy = bajtytablicy.asIntBuffer();
+                    for(int i = 0; i < Dane.rozmiar; i++) {
+                        intbajtytablicy.get(dane.tablica[i], 0, Dane.rozmiar);
+                    }
+                } catch (Exception e) {
+                    sukces = false;
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                long suma = dane.suma();
+                if(sukces) {
+                    ustawWynik("Powodzenie: " + czas + " Suma: " + suma);
+                } else {
+                    ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
             }
         }).start();
