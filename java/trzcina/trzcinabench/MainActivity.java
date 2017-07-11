@@ -4,10 +4,16 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -71,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 odczytDanychTab();
+            }
+        });
+        findViewById(R.id.grafika).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                grafika();
             }
         });
     }
@@ -299,6 +311,72 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas);
                 }
+            }
+        }).start();
+    }
+
+    private void czekaj(int milisekundy) {
+        try {
+            Thread.sleep(milisekundy);
+        } catch (InterruptedException e) {
+        }
+    }
+
+    private void rysuj(int x, int y, MainSurface surface, Bitmap testowy) {
+        Canvas canvass = surface.surfaceholder.lockCanvas();
+        canvass.drawColor(Color.WHITE);
+        canvass.drawBitmap(testowy, x, y, null);
+        surface.surfaceholder.unlockCanvasAndPost(canvass);
+    }
+
+    private void grafika() {
+        final MainSurface surface = new MainSurface(this);
+        final RelativeLayout layout = (RelativeLayout)(findViewById(R.id.activity));
+        layout.addView(surface);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(surface.gotowe == false) {
+                    czekaj(1);
+                }
+                final Point rozdzielczosc = new Point();
+                rozdzielczosc.x = surface.getWidth() / 2;
+                rozdzielczosc.y = surface.getHeight() / 2;
+                Bitmap testowyobraz = BitmapFactory.decodeResource(getResources(), R.mipmap.test);
+                Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(testowy);
+                canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                long start = System.currentTimeMillis();
+                int ilosc = 0;
+                if (surface.surfaceholder.getSurface().isValid()) {
+                    for(int x = 0; x <= rozdzielczosc.x; x++) {
+                        rysuj(x, 0, surface, testowy);
+                        ilosc++;
+                    }
+                    for(int y = 0; y <= rozdzielczosc.y; y++) {
+                        rysuj(rozdzielczosc.x, y, surface, testowy);
+                        ilosc++;
+                    }
+                    for(int x = rozdzielczosc.x; x >= 0; x--) {
+                        rysuj(x, rozdzielczosc.y, surface, testowy);
+                        ilosc++;
+                    }
+                    for(int y = rozdzielczosc.y; y >= 0; y--) {
+                        rysuj(0, y, surface, testowy);
+                        ilosc++;
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.removeView(surface);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
             }
         }).start();
     }
