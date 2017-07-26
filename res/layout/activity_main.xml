@@ -133,6 +133,14 @@
         android:visibility="invisible"
         android:layout_alignParentBottom="true" />
 
+    <Button
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Info"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/progressbar" />
+
     <TextView
         android:id="@+id/wynik"
         android:layout_width="wrap_content"
@@ -143,13 +151,5 @@
         android:text=""
         android:textColor="@android:color/holo_red_dark"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Info"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/progressbar" />
 
 </RelativeLayout>
