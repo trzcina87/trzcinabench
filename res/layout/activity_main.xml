@@ -8,17 +8,6 @@
     android:id="@+id/activity"
     tools:context="trzcina.trzcinabench.MainActivity">
 
-    <TextView
-        android:id="@+id/wynik"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_weight="1"
-        android:text=""
-        android:textColor="@android:color/holo_red_dark"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -128,12 +117,11 @@
             android:text="Kompaktowanie" />
 
         <Button
-            android:id="@+id/puste"
+            android:id="@+id/petla"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="invisible"
-            android:text="" />
+            android:text="Petla" />
     </LinearLayout>
 
     <TextView
@@ -141,7 +129,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/lay5"
-        android:text="Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :\nGrafika - przesuwa grafike\nZapis Tablica - zapisuje tablice 1000 x 1000 int do pliku\nOdczyt Tablica - odczytuje tablice 1000 x 1000 int z pliku\nKompaktowanie - alokuje pamięć po 1MB, zwalnia co drugą tablicę i alokuje bitmapę." />
+        android:text="Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :\nGrafika - przesuwa grafike\nZapis Tablica - zapisuje tablice 1000 x 1000 int do pliku\nOdczyt Tablica - odczytuje tablice 1000 x 1000 int z pliku\nKompaktowanie - alokuje pamięć po 1MB, zwalnia co drugą tablicę i alokuje bitmapę.\nPetla - wykonuje sprawdzanie czasu w petli while" />
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -151,6 +139,17 @@
         android:layout_alignParentEnd="true"
         android:visibility="invisible"
         android:layout_alignParentBottom="true" />
+
+    <TextView
+        android:id="@+id/wynik"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_weight="1"
+        android:text=""
+        android:textColor="@android:color/holo_red_dark"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>

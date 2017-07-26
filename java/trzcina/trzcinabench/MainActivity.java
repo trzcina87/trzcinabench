@@ -94,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
                 kompaktowanie();
             }
         });
+        findViewById(R.id.petla).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                petla();
+            }
+        });
         Date buildDate = new Date(BuildConfig.TIMESTAMP);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String data = dateFormat.format(buildDate);
@@ -468,6 +474,26 @@ public class MainActivity extends AppCompatActivity {
                 } catch (OutOfMemoryError e) {
                 }
                 ustawWynik("Zwolniono: " + zwolniono + "MB, Alokacja Bitmapy: " + alokacja + " Rozmiar: " + size);
+                ukryjBar();
+            }
+        }).start();
+    }
+
+    private void petla() {
+        pokrazBar();
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long start = System.currentTimeMillis();
+                long ilosc = 0;
+                while(System.currentTimeMillis() <= start + 5000) {
+                    ilosc = ilosc + 1;
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                int lps = (int) ((float)ilosc / (float)czas * (float)1000);
+                ustawWynik("Szybkosc petli: " + lps + "/s");
                 ukryjBar();
             }
         }).start();
