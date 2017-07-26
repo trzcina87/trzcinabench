@@ -10,9 +10,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Display;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -27,10 +26,14 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView wynik;
+    private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,18 @@ public class MainActivity extends AppCompatActivity {
                 grafika();
             }
         });
+        findViewById(R.id.kompaktowanie).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                kompaktowanie();
+            }
+        });
+        Date buildDate = new Date(BuildConfig.TIMESTAMP);
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String data = dateFormat.format(buildDate);
+        setTitle("TrzcinaBench " + data);
+        progress = (ProgressBar)findViewById(R.id.progressbar);
+        progress.getIndeterminateDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     private void ustawWynik(final String string) {
@@ -96,7 +111,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void pokrazBar() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void ukryjBar() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progress.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
     private void wczytajBitmapy() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -125,11 +159,13 @@ public class MainActivity extends AppCompatActivity {
                 long koniec = System.currentTimeMillis();
                 long czas = koniec - start;
                 ustawWynik("Wczytanie 5 bitmap (suma szer: " + size + "): " + czas);
+                ukryjBar();
             }
         }).start();
     }
 
     private void alokacjaPamieci() {
+        pokrazBar();
         wynik.setText("");
         ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         final int pamiec = am.getMemoryClass();
@@ -143,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 int i = 0;
                 while(dzialam) {
                     try {
-                        tablica[i] = new long[128000];
+                        tablica[i] = new long[131072];
                         i = i + 1;
                         Thread.sleep(5);
                     } catch (OutOfMemoryError e) {
@@ -153,11 +189,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 ustawWynik("Long: " + bajtylong + " bajty\nPamiec: " + pamiec + "\nPamiec Max: " + pamiecmax + "\nZaalokowano: " + i + " MB");
+                ukryjBar();
             }
         }).start();
     }
 
     private void zapisDanych() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -183,11 +221,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
+                ukryjBar();
             }
         }).start();
     }
 
     private void zapisDanychReczny() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -217,11 +257,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
+                ukryjBar();
             }
         }).start();
     }
 
     private void odczytDanych() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -246,11 +288,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
+                ukryjBar();
             }
         }).start();
     }
 
     private void odczytDanychTab() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -279,11 +323,13 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas + " Suma: " + suma);
                 }
+                ukryjBar();
             }
         }).start();
     }
 
     private void podzialPliku() {
+        pokrazBar();
         wynik.setText("");
         new Thread(new Runnable() {
             @Override
@@ -311,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     ustawWynik("Blad: " + czas);
                 }
+                ukryjBar();
             }
         }).start();
     }
@@ -330,6 +377,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void grafika() {
+        pokrazBar();
         final MainSurface surface = new MainSurface(this);
         final RelativeLayout layout = (RelativeLayout)(findViewById(R.id.activity));
         layout.addView(surface);
@@ -377,6 +425,50 @@ public class MainActivity extends AppCompatActivity {
                 });
                 float fps = (float)ilosc / (float)czas * 1000F;
                 ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
+                ukryjBar();
+            }
+        }).start();
+    }
+
+    private void kompaktowanie() {
+        pokrazBar();
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                long tablica[][] = new long[1000][];
+                boolean dzialam = true;
+                int i = 0;
+                while(dzialam) {
+                    try {
+                        tablica[i] = new long[131072];
+                        i = i + 1;
+                        Thread.sleep(5);
+                    } catch (OutOfMemoryError e) {
+                        dzialam = false;
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                int zwolniono = 0;
+                for(int j = 0; j < i; j++) {
+                    if(j % 2 == 0) {
+                        tablica[j] = null;
+                        zwolniono = zwolniono + 1;
+                    }
+                }
+                Bitmap tmp;
+                int size = 0;
+                boolean alokacja = false;
+                try {
+                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
+                    size = tmp.getWidth();
+                    tmp = null;
+                    alokacja = true;
+                } catch (OutOfMemoryError e) {
+                }
+                ustawWynik("Zwolniono: " + zwolniono + "MB, Alokacja Bitmapy: " + alokacja + " Rozmiar: " + size);
+                ukryjBar();
             }
         }).start();
     }
