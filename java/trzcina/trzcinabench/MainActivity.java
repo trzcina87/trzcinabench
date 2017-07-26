@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView wynik;
     private ProgressBar progress;
+    private String info = "Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :\nGrafika - przesuwa grafike\nZapis Tablica - zapisuje tablice 1000 x 1000 int do pliku\nOdczyt Tablica - odczytuje tablice 1000 x 1000 int z pliku\nKompaktowanie - alokuje pamięć po 1MB, zwalnia co drugą tablicę i alokuje bitmapę.\nPetla - wykonuje sprawdzanie czasu w petli while";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 kompaktowanie();
+            }
+        });
+        findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(MainActivity.this).setIcon(android.R.drawable.ic_dialog_info).setTitle("Info").setMessage(info).setNeutralButton("Zamknij", null).show();
             }
         });
         findViewById(R.id.petla).setOnClickListener(new View.OnClickListener() {
