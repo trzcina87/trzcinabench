@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 wynik.setText(string);
+                wynik.bringToFront();
             }
         });
     }
