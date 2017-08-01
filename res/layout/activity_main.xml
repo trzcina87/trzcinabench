@@ -125,6 +125,30 @@
             android:text="Petla" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/lay6"
+        android:layout_below="@id/lay5"
+        android:layout_alignParentStart="true">
+
+        <Button
+            android:id="@+id/bitmapa"
+            android:layout_width="match_parent"
+            android:layout_height="120px"
+            android:layout_weight="1"
+            android:text="Bitmapa" />
+
+        <Button
+            android:id="@+id/hidden"
+            android:layout_width="match_parent"
+            android:layout_height="120px"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            android:text="" />
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressbar"
         style="?android:attr/progressBarStyle"

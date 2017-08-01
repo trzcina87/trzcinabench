@@ -30,6 +30,7 @@ import java.nio.IntBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -94,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 kompaktowanie();
+            }
+        });
+        findViewById(R.id.bitmapa).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapa();
             }
         });
         findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
@@ -428,6 +435,51 @@ public class MainActivity extends AppCompatActivity {
                     for(int y = rozdzielczosc.y; y >= 0; y--) {
                         rysuj(0, y, surface, testowy);
                         ilosc++;
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.removeView(surface);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
+                ukryjBar();
+            }
+        }).start();
+    }
+
+    private void bitmapa() {
+        pokrazBar();
+        final MainSurface surface = new MainSurface(this);
+        final RelativeLayout layout = (RelativeLayout)(findViewById(R.id.activity));
+        layout.addView(surface);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(surface.gotowe == false) {
+                    czekaj(1);
+                }
+                final Point rozdzielczosc = new Point();
+                rozdzielczosc.x = surface.getWidth();
+                rozdzielczosc.y = surface.getHeight();
+                Bitmap testowyobraz = BitmapFactory.decodeResource(getResources(), R.mipmap.test);
+                Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(testowy);
+                canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                long start = System.currentTimeMillis();
+                int ilosc = 0;
+                Random random = new Random();
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if (surface.surfaceholder.getSurface().isValid()) {
+                        int x = random.nextInt(100) - 50;
+                        int y = random.nextInt(100) - 50;
+                        rysuj(x, y, surface, testowy);
+                        ilosc = ilosc + 1;
                     }
                 }
                 long koniec = System.currentTimeMillis();
