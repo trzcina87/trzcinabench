@@ -484,6 +484,18 @@ public class MainActivity extends AppCompatActivity {
                 }
                 long koniec = System.currentTimeMillis();
                 long czas = koniec - start;
+                long start2 = System.currentTimeMillis();
+                int ilosc2 = 0;
+                for(int i = 0; i <= 2; i++){
+                    for (int x = -60; x <= 60; x++) {
+                        if (surface.surfaceholder.getSurface().isValid()) {
+                            rysuj(x, x, surface, testowy);
+                            ilosc2 = ilosc2 + 1;
+                        }
+                    }
+                }
+                long koniec2 = System.currentTimeMillis();
+                long czas2 = koniec2 - start2;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -491,7 +503,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 float fps = (float)ilosc / (float)czas * 1000F;
-                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
+                float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
                 ukryjBar();
             }
         }).start();
