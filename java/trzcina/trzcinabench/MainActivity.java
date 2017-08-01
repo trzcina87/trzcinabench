@@ -471,14 +471,18 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(testowy);
                 canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Random random = new Random();
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(100) - 50;
+                    y[i] = random.nextInt(100) - 50;
+                }
                 long start = System.currentTimeMillis();
                 int ilosc = 0;
-                Random random = new Random();
                 while(System.currentTimeMillis() <= start + 10000) {
                     if (surface.surfaceholder.getSurface().isValid()) {
-                        int x = random.nextInt(100) - 50;
-                        int y = random.nextInt(100) - 50;
-                        rysuj(x, y, surface, testowy);
+                        rysuj(x[ilosc], y[ilosc], surface, testowy);
                         ilosc = ilosc + 1;
                     }
                 }
@@ -487,9 +491,9 @@ public class MainActivity extends AppCompatActivity {
                 long start2 = System.currentTimeMillis();
                 int ilosc2 = 0;
                 for(int i = 0; i <= 2; i++){
-                    for (int x = -60; x <= 60; x++) {
+                    for (int xx = -60; xx <= 60; xx++) {
                         if (surface.surfaceholder.getSurface().isValid()) {
-                            rysuj(x, x, surface, testowy);
+                            rysuj(xx, xx, surface, testowy);
                             ilosc2 = ilosc2 + 1;
                         }
                     }
