@@ -156,6 +156,29 @@
                     android:text="Bitmapa ImageView" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/lay7"
+                android:layout_below="@id/lay6"
+                android:layout_alignParentStart="true">
+
+                <Button
+                    android:id="@+id/bitmapa2"
+                    android:layout_width="match_parent"
+                    android:layout_height="120px"
+                    android:layout_weight="1"
+                    android:text="2 Bitmapa" />
+
+                <Button
+                    android:id="@+id/bitmapaimageview2"
+                    android:layout_width="match_parent"
+                    android:layout_height="120px"
+                    android:layout_weight="1"
+                    android:text="2 Bitmapa ImageView" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

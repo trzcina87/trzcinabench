@@ -127,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
                 bitmapaimageview();
             }
         });
+        findViewById(R.id.bitmapaimageview2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapaimageview2();
+            }
+        });
         findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,6 +143,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 petla();
+            }
+        });
+        findViewById(R.id.bitmapa2).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapa2();
             }
         });
         Date buildDate = new Date(BuildConfig.TIMESTAMP);
@@ -537,6 +549,84 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void bitmapa2() {
+        pokrazBar();
+        final MainSurface surface = new MainSurface(this);
+        final RelativeLayout layout = (RelativeLayout)(findViewById(R.id.activity));
+        layout.addView(surface);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(surface.gotowe == false) {
+                    czekaj(1);
+                }
+                final Point rozdzielczosc = new Point();
+                rozdzielczosc.x = surface.getWidth();
+                rozdzielczosc.y = surface.getHeight();
+                Bitmap testowyobraz = BitmapFactory.decodeResource(getResources(), R.mipmap.test);
+                Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(testowy);
+                canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Bitmap testowyobraz2 = BitmapFactory.decodeResource(getResources(), R.mipmap.test2);
+                Bitmap testowy2 = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas2 = new Canvas(testowy2);
+                canvas2.drawBitmap(testowyobraz2, new Rect(0, 0, testowyobraz2.getWidth(), testowyobraz2.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Random random = new Random();
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(100) - 50;
+                    y[i] = random.nextInt(100) - 50;
+                }
+                long start = System.currentTimeMillis();
+                int ilosc = 0;
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if (surface.surfaceholder.getSurface().isValid()) {
+                        Bitmap link = null;
+                        if(ilosc % 2 == 0) {
+                            link = testowy;
+                        } else {
+                            link = testowy2;
+                        }
+                        rysuj(x[ilosc], y[ilosc], surface, link);
+                        ilosc = ilosc + 1;
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                long start2 = System.currentTimeMillis();
+                int ilosc2 = 0;
+                for(int i = 0; i <= 2; i++){
+                    for (int xx = -60; xx <= 60; xx++) {
+                        if (surface.surfaceholder.getSurface().isValid()) {
+                            Bitmap link = null;
+                            if(ilosc2 % 2 == 0) {
+                                link = testowy;
+                            } else {
+                                link = testowy2;
+                            }
+                            rysuj(xx, xx, surface, link);
+                            ilosc2 = ilosc2 + 1;
+                        }
+                    }
+                }
+                long koniec2 = System.currentTimeMillis();
+                long czas2 = koniec2 - start2;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.removeView(surface);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ukryjBar();
+            }
+        }).start();
+    }
+
     private void rysujImageView(final int x, final int y, final ImageView im, final Bitmap bm) {
         runOnUiThread(new Runnable() {
             @Override
@@ -559,6 +649,86 @@ public class MainActivity extends AppCompatActivity {
                 ilosc2 = ilosc2 + 1;
             }
         });
+    }
+
+    private void bitmapaimageview2() {
+        pokrazBar();
+        activitymain.removeView(glowne);
+        activitymain.addView(al);
+        final ImageView im = (ImageView) findViewById(R.id.alim);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Point rozdzielczosc = new Point();
+                while(im.getWidth() <= 0) {
+                    czekaj(1);
+                }
+                rozdzielczosc.x = im.getWidth();
+                rozdzielczosc.y = im.getHeight();
+                Bitmap testowyobraz = BitmapFactory.decodeResource(getResources(), R.mipmap.test);
+                Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(testowy);
+                canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Bitmap testowyobraz2 = BitmapFactory.decodeResource(getResources(), R.mipmap.test2);
+                Bitmap testowy2 = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas2 = new Canvas(testowy2);
+                canvas2.drawBitmap(testowyobraz2, new Rect(0, 0, testowyobraz2.getWidth(), testowyobraz2.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Random random = new Random();
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(100) - 50;
+                    y[i] = random.nextInt(100) - 50;
+                }
+                long start = System.currentTimeMillis();
+                ilosc = 0;
+                int ilosclok = -1;
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if(ilosclok != ilosc) {
+                        ilosclok = ilosc;
+                        Bitmap link = null;
+                        if(ilosc % 2 == 0) {
+                            link = testowy;
+                        } else {
+                            link = testowy2;
+                        }
+                        rysujImageView(x[ilosc], y[ilosc], im, link);
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                long start2 = System.currentTimeMillis();
+                ilosc2 = 0;
+                ilosclok = -1;
+                for(int i = 0; i <= 2; i++){
+                    for (int xx = -60; xx <= 60; xx++) {
+                        while(ilosclok == ilosc2);
+                        ilosclok = ilosc2;
+                        Bitmap link = null;
+                        if(ilosc2 % 2 == 0) {
+                            link = testowy;
+                        } else {
+                            link = testowy2;
+                        }
+                        rysujImageView2(xx, xx, im, link);
+                    }
+                }
+                long koniec2 = System.currentTimeMillis();
+                long czas2 = koniec2 - start2;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        activitymain.removeView(al);
+                        activitymain.addView(glowne);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ukryjBar();
+            }
+        }).start();
     }
 
     private void bitmapaimageview() {
