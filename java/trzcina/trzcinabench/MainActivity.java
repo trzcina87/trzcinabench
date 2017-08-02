@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(testowy);
                 canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                boolean hwacc = canvas.isHardwareAccelerated();
                 Random random = new Random();
                 int[] x = new int[200*10];
                 int[] y = new int[200*10];
@@ -589,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 float fps = (float)ilosc / (float)czas * 1000F;
                 float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
-                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2) + " Sprzet: " + hwacc);
                 ukryjBar();
             }
         }).start();
@@ -916,6 +917,8 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(testowy);
                 canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                boolean hwacc = canvas.isHardwareAccelerated();
+                boolean hwacc2 = im.isHardwareAccelerated();
                 Random random = new Random();
                 int[] x = new int[200*10];
                 int[] y = new int[200*10];
@@ -955,7 +958,7 @@ public class MainActivity extends AppCompatActivity {
                 });
                 float fps = (float)ilosc / (float)czas * 1000F;
                 float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
-                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2) + " Sprzet: " + hwacc + " " + hwacc2);
                 ukryjBar();
             }
         }).start();
