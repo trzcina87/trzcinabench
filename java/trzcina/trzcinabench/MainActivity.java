@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v7.app.AlertDialog;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public volatile int ilosc;
     public volatile int ilosc2;
     private AbsoluteLayout al;
+    public Paint paint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,12 +153,26 @@ public class MainActivity extends AppCompatActivity {
                 bitmapa2();
             }
         });
+        findViewById(R.id.bitmapakola).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapakola();
+            }
+        });
+        findViewById(R.id.bitmapaimageviewkola).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapaimageviewkola();
+            }
+        });
         Date buildDate = new Date(BuildConfig.TIMESTAMP);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         String data = dateFormat.format(buildDate);
         setTitle("TrzcinaBench " + data);
         progress = (ProgressBar)findViewById(R.id.progressbar);
         progress.getIndeterminateDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.MULTIPLY);
+        paint = new Paint();
+        paint.setColor(Color.RED);
     }
 
     private void ustawWynik(final String string) {
@@ -433,6 +449,13 @@ public class MainActivity extends AppCompatActivity {
         surface.surfaceholder.unlockCanvasAndPost(canvass);
     }
 
+    private void rysujkolo(int x, int y, int r, MainSurface surface) {
+        Canvas canvass = surface.surfaceholder.lockCanvas();
+        canvass.drawColor(Color.BLACK);
+        canvass.drawCircle(x, y, r, paint);
+        surface.surfaceholder.unlockCanvasAndPost(canvass);
+    }
+
     private void grafika() {
         pokrazBar();
         final MainSurface surface = new MainSurface(this);
@@ -627,6 +650,53 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void bitmapakola() {
+        pokrazBar();
+        final MainSurface surface = new MainSurface(this);
+        final RelativeLayout layout = (RelativeLayout)(findViewById(R.id.activity));
+        layout.addView(surface);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(surface.gotowe == false) {
+                    czekaj(1);
+                }
+                final Point rozdzielczosc = new Point();
+                rozdzielczosc.x = surface.getWidth();
+                rozdzielczosc.y = surface.getHeight();
+                Random random = new Random(1);
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                int[] r = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(rozdzielczosc.x);
+                    y[i] = random.nextInt(rozdzielczosc.y);
+                    r[i] = random.nextInt(20);
+                }
+                long start = System.currentTimeMillis();
+                int ilosc = 0;
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if (surface.surfaceholder.getSurface().isValid()) {
+                        rysujkolo(x[ilosc], y[ilosc], r[ilosc], surface);
+                        ilosc = ilosc + 1;
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.removeView(surface);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
+                ukryjBar();
+            }
+        }).start();
+    }
+
     private void rysujImageView(final int x, final int y, final ImageView im, final Bitmap bm) {
         runOnUiThread(new Runnable() {
             @Override
@@ -647,6 +717,18 @@ public class MainActivity extends AppCompatActivity {
                 im.setX(x);
                 im.setY(y);
                 ilosc2 = ilosc2 + 1;
+            }
+        });
+    }
+
+    private void rysujImageView3(final int x, final int y, final int r, final ImageView im, final Bitmap bmp, final Canvas canvas) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                canvas.drawColor(Color.BLACK);
+                canvas.drawCircle(x, y, r, paint);
+                im.setImageBitmap(bmp);
+                ilosc = ilosc + 1;
             }
         });
     }
@@ -790,6 +872,59 @@ public class MainActivity extends AppCompatActivity {
                 float fps = (float)ilosc / (float)czas * 1000F;
                 float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
                 ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ukryjBar();
+            }
+        }).start();
+    }
+
+    private void bitmapaimageviewkola() {
+        pokrazBar();
+        activitymain.removeView(glowne);
+        activitymain.addView(al);
+        final ImageView im = (ImageView) findViewById(R.id.alim);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Point rozdzielczosc = new Point();
+                while(im.getWidth() <= 0) {
+                    czekaj(1);
+                }
+                im.setX(0);
+                im.setY(0);
+                Bitmap bmp = Bitmap.createBitmap(im.getWidth(), im.getHeight(), Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bmp);
+                rozdzielczosc.x = im.getWidth();
+                rozdzielczosc.y = im.getHeight();
+                Random random = new Random(1);
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                int[] r = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(rozdzielczosc.x);
+                    y[i] = random.nextInt(rozdzielczosc.y);
+                    r[i] = random.nextInt(20);
+                }
+                long start = System.currentTimeMillis();
+                ilosc = 0;
+                int ilosclok = -1;
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if(ilosclok != ilosc) {
+                        ilosclok = ilosc;
+                        rysujImageView3(x[ilosc], y[ilosc], r[ilosc], im, bmp, canvas);
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        activitymain.removeView(al);
+                        activitymain.addView(glowne);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps));
                 ukryjBar();
             }
         }).start();

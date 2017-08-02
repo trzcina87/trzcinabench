@@ -179,6 +179,29 @@
                     android:text="2 Bitmapa ImageView" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/lay8"
+                android:layout_below="@id/lay7"
+                android:layout_alignParentStart="true">
+
+                <Button
+                    android:id="@+id/bitmapakola"
+                    android:layout_width="match_parent"
+                    android:layout_height="120px"
+                    android:layout_weight="1"
+                    android:text="Bitmapa Kola" />
+
+                <Button
+                    android:id="@+id/bitmapaimageviewkola"
+                    android:layout_width="match_parent"
+                    android:layout_height="120px"
+                    android:layout_weight="1"
+                    android:text="Bitmapa IV Kola" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
