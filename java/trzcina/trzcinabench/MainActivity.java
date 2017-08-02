@@ -11,7 +11,12 @@ import android.graphics.Rect;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsoluteLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,11 +42,24 @@ public class MainActivity extends AppCompatActivity {
     private TextView wynik;
     private ProgressBar progress;
     private String info = "Bitmapy - wczytuje 5 bitmap 6000x4000 jedna po drugiej\nAlokacja - alokuje po 1MB RAMu\nZapis - serializuje tablice 1000 x 1000 int\nOdczyt - odserializuje tablice 1000 x 1000 int\nPodzial - wczutuje plik i dzieli linie po :\nGrafika - przesuwa grafike\nZapis Tablica - zapisuje tablice 1000 x 1000 int do pliku\nOdczyt Tablica - odczytuje tablice 1000 x 1000 int z pliku\nKompaktowanie - alokuje pamięć po 1MB, zwalnia co drugą tablicę i alokuje bitmapę.\nPetla - wykonuje sprawdzanie czasu w petli while";
+    private RelativeLayout activitymain;
+    private LinearLayout glowne;
+    public volatile int ilosc;
+    public volatile int ilosc2;
+    private AbsoluteLayout al;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+        activitymain = (RelativeLayout) inflater.inflate(R.layout.activity_main, null);
+        activitymain.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        setContentView(activitymain);
+        glowne = (LinearLayout) inflater.inflate(R.layout.glowne, null);
+        glowne.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        activitymain.addView(glowne);
+        al = (AbsoluteLayout) inflater.inflate(R.layout.al, null);
+        al.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         wynik = (TextView)findViewById(R.id.wynik);
         findViewById(R.id.bitmapy).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +121,12 @@ public class MainActivity extends AppCompatActivity {
                 bitmapa();
             }
         });
+        findViewById(R.id.bitmapaimageview).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bitmapaimageview();
+            }
+        });
         findViewById(R.id.info).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 wynik.setText(string);
-                wynik.bringToFront();
             }
         });
     }
@@ -504,6 +527,94 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         layout.removeView(surface);
+                    }
+                });
+                float fps = (float)ilosc / (float)czas * 1000F;
+                float fps2 = (float)ilosc2 / (float)czas2 * 1000F;
+                ustawWynik("Czas: " + czas + " FPS: " + String.format("%.2f", fps) + " " + String.format("%.2f", fps2));
+                ukryjBar();
+            }
+        }).start();
+    }
+
+    private void rysujImageView(final int x, final int y, final ImageView im, final Bitmap bm) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                im.setImageBitmap(bm);
+                im.setX(x);
+                im.setY(y);
+                ilosc = ilosc + 1;
+            }
+        });
+    }
+
+    private void rysujImageView2(final int x, final int y, final ImageView im, final Bitmap bm) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                im.setImageBitmap(bm);
+                im.setX(x);
+                im.setY(y);
+                ilosc2 = ilosc2 + 1;
+            }
+        });
+    }
+
+    private void bitmapaimageview() {
+        pokrazBar();
+        activitymain.removeView(glowne);
+        activitymain.addView(al);
+        final ImageView im = (ImageView) findViewById(R.id.alim);
+        wynik.setText("");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Point rozdzielczosc = new Point();
+                while(im.getWidth() <= 0) {
+                    czekaj(1);
+                }
+                rozdzielczosc.x = im.getWidth();
+                rozdzielczosc.y = im.getHeight();
+                Bitmap testowyobraz = BitmapFactory.decodeResource(getResources(), R.mipmap.test);
+                Bitmap testowy = Bitmap.createBitmap(rozdzielczosc.x, rozdzielczosc.y , Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(testowy);
+                canvas.drawBitmap(testowyobraz, new Rect(0, 0, testowyobraz.getWidth(), testowyobraz.getHeight()), new Rect(0, 0, rozdzielczosc.x, rozdzielczosc.y), null);
+                Random random = new Random();
+                int[] x = new int[200*10];
+                int[] y = new int[200*10];
+                for(int i = 0; i < 200*10; i++) {
+                    x[i] = random.nextInt(100) - 50;
+                    y[i] = random.nextInt(100) - 50;
+                }
+                long start = System.currentTimeMillis();
+                ilosc = 0;
+                int ilosclok = -1;
+                while(System.currentTimeMillis() <= start + 10000) {
+                    if(ilosclok != ilosc) {
+                        ilosclok = ilosc;
+                        rysujImageView(x[ilosc], y[ilosc], im, testowy);
+                    }
+                }
+                long koniec = System.currentTimeMillis();
+                long czas = koniec - start;
+                long start2 = System.currentTimeMillis();
+                ilosc2 = 0;
+                ilosclok = -1;
+                for(int i = 0; i <= 2; i++){
+                    for (int xx = -60; xx <= 60; xx++) {
+                        while(ilosclok == ilosc2);
+                        ilosclok = ilosc2;
+                        rysujImageView2(xx, xx, im, testowy);
+                    }
+                }
+                long koniec2 = System.currentTimeMillis();
+                long czas2 = koniec2 - start2;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        activitymain.removeView(al);
+                        activitymain.addView(glowne);
                     }
                 });
                 float fps = (float)ilosc / (float)czas * 1000F;
