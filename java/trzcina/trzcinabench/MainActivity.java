@@ -216,36 +216,103 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private class BitmapyWatek extends Thread {
+        public volatile long start;
+        public volatile long koniec;
+        public volatile long czas;
+        public volatile int size;
+        public volatile boolean sukces;
+
+        public BitmapyWatek(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            start = System.currentTimeMillis();
+            Bitmap tmp;
+            size = 0;
+            sukces = false;
+            try {
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b2);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b3);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b4);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b5);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b6);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b7);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b8);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b9);
+                size = size + tmp.getWidth();
+                tmp = null;
+                tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b10);
+                size = size + tmp.getWidth();
+                tmp = null;
+                sukces = true;
+            } catch (OutOfMemoryError e) {
+                sukces = false;
+            }
+            koniec = System.currentTimeMillis();
+            czas = koniec - start;
+        }
+    }
+
     private void wczytajBitmapy() {
         pokrazBar();
         wynik.setText("");
+        final StringBuffer line = new StringBuffer();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 long start = System.currentTimeMillis();
-                Bitmap tmp;
-                int size = 0;
-                try {
-                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b1);
-                    size = size + tmp.getWidth();
-                    tmp = null;
-                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b2);
-                    size = size + tmp.getWidth();
-                    tmp = null;
-                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b3);
-                    size = size + tmp.getWidth();
-                    tmp = null;
-                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b4);
-                    size = size + tmp.getWidth();
-                    tmp = null;
-                    tmp = BitmapFactory.decodeResource(getResources(), R.mipmap.b5);
-                    size = size + tmp.getWidth();
-                    tmp = null;
-                } catch (OutOfMemoryError e) {
+                int[] threads = {1, 2, 4, 8, 16};
+                for(int i = 0; i < threads.length; i++) {
+                    int num_threads = threads[i];
+                    BitmapyWatek[] watki = new BitmapyWatek[num_threads];
+                    for(int j = 0; j < num_threads; j++) {
+                        watki[j] = new BitmapyWatek("");
+                        watki[j].start();
+                    }
+                    for(int j = 0; j < num_threads; j++) {
+                        try {
+                            watki[j].join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    boolean sukces = true;
+                    long sumaczasow = 0;
+                    long sumabokow = 0;
+                    for(int j = 0; j < num_threads; j++) {
+                        if(watki[j].sukces == false) {
+                            sukces = false;
+                        }
+                        sumaczasow = sumaczasow + watki[j].czas;
+                        sumabokow = sumabokow + watki[j].size;
+                    }
+                    long srednia = sumaczasow / num_threads;
+                    sumabokow = sumabokow / 1000;
+                    line.append("th " + num_threads + ": suk " + sukces + " av " + srednia + " sum " + sumabokow + "k\n");
                 }
-                long koniec = System.currentTimeMillis();
-                long czas = koniec - start;
-                ustawWynik("Wczytanie 5 bitmap (suma szer: " + size + "): " + czas);
+                long czas = System.currentTimeMillis() - start;
+                line.append("Calosc: " + czas);
+                ustawWynik(line.toString());
                 ukryjBar();
             }
         }).start();
@@ -415,35 +482,77 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private class PodzialWatek extends Thread {
+        public volatile long start;
+        public volatile long koniec;
+        public volatile long czas;
+        public volatile boolean sukces;
+
+        public PodzialWatek(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            start = System.currentTimeMillis();
+            InputStream raw = getResources().openRawResource(R.raw.merkator);
+            BufferedReader rawreader = new BufferedReader(new InputStreamReader(raw));
+            String line;
+            sukces = false;
+            double[] merkator = new double[90002];
+            int i = 0;
+            try {
+                while ((line = rawreader.readLine()) != null) {
+                    String[] lines = line.split(",");
+                    merkator[i] = Double.valueOf(lines[1]);
+                    i++;
+                }
+                sukces = true;
+            } catch (IOException e) {
+                sukces = false;
+            }
+            koniec = System.currentTimeMillis();
+            czas = koniec - start;
+        }
+    }
+
     private void podzialPliku() {
         pokrazBar();
         wynik.setText("");
+        final StringBuffer line = new StringBuffer();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 long start = System.currentTimeMillis();
-                InputStream raw = getResources().openRawResource(R.raw.merkator);
-                BufferedReader rawreader = new BufferedReader(new InputStreamReader(raw));
-                String line;
-                boolean sukces = true;
-                double[] merkator = new double[90002];
-                int i = 0;
-                try {
-                    while ((line = rawreader.readLine()) != null) {
-                        String[] lines = line.split(",");
-                        merkator[i] = Double.valueOf(lines[1]);
-                        i++;
+                int[] threads = {1, 2, 4, 8, 16, 32};
+                for(int i = 0; i < threads.length; i++) {
+                    int num_threads = threads[i];
+                    PodzialWatek[] watki = new PodzialWatek[num_threads];
+                    for(int j = 0; j < num_threads; j++) {
+                        watki[j] = new PodzialWatek("");
+                        watki[j].start();
                     }
-                } catch (IOException e) {
-                    sukces = false;
+                    for(int j = 0; j < num_threads; j++) {
+                        try {
+                            watki[j].join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    boolean sukces = true;
+                    long sumaczasow = 0;
+                    for(int j = 0; j < num_threads; j++) {
+                        if(watki[j].sukces == false) {
+                            sukces = false;
+                        }
+                        sumaczasow = sumaczasow + watki[j].czas;
+                    }
+                    long srednia = sumaczasow / num_threads;
+                    line.append("th: " + num_threads + ": suk: " + sukces + " avg: " + srednia + "\n");
                 }
-                long koniec = System.currentTimeMillis();
-                long czas = koniec - start;
-                if(sukces) {
-                    ustawWynik("Powodzenie: " + czas);
-                } else {
-                    ustawWynik("Blad: " + czas);
-                }
+                long czas = System.currentTimeMillis() - start;
+                line.append("Calosc: " + czas);
+                ustawWynik(line.toString());
                 ukryjBar();
             }
         }).start();
